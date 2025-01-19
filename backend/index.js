@@ -7,12 +7,13 @@ const User = require('./models/User')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const jwtSecret = process.env.JWT_SECRET
+console.log(process.env.FRONTEND_URL)
 
 app.use(cors({
-    credentials: true,
-    origin: process.env.CLIENT_URL
+    origin: process.env.FRONTEND_URL,
+    credentials: true
 }))
-app.use(express.json()); // Fix: add parentheses to call express.json()
+app.use(express.json());
 mongoose.connect(process.env.MONGO_URL)
 
 
@@ -22,16 +23,21 @@ app.get('/', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
+    const existingUser = User.find({username})
+    if(existingUser) {
+        return res.status(409).json({
+            msg: "user already exist"
+        })
+        
+    }
     try {
         const newUser = await User.create({ username, password });
         const token = jwt.sign({
             userId: newUser._id
         },jwtSecret )
-        res.cookie('token', token)
-        res.status(201).json({
-            token,
-            newUser
-        });
+        res.cookie('token', token).status(201).json({
+            _id: newUser._id
+        })
     } catch (error) {
         res.status(500).json({ error: 'Error registering new user' });
     }

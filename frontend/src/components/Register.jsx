@@ -6,7 +6,7 @@ const Register = () => {
 	const [password, setPassword] = useState('')
 	async function register(e){
 		e.preventDefault()
-		const response = await axios.post('/register', {
+		await axios.post('/register', {
 				username: username,
 				password: password
 			})
