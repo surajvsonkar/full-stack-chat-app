@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Register from './components/Register';
+import Register from './components/RegisterAndLoginForm';
 import { UserContext, UserContextProvider } from './contexts/UserContext';
 import { useContext } from 'react';
 import Routes from './routes/Routes';
@@ -10,7 +10,7 @@ function App() {
 	return (
 		<>
 			<UserContextProvider>
-				<Routes/>
+				<Routes />
 			</UserContextProvider>
 		</>
 	);

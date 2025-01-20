@@ -12,6 +12,7 @@ export function UserContextProvider({children}) {
             setId(res.data.userId)
             setLoggedUsername(res.data.username)
         })
+        console.log(username)
     }, [])
     return (
         <UserContext.Provider value={{username, setLoggedUsername, id, setId}}>
