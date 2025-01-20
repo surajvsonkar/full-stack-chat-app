@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
 dotenv.config()
 const mongoose = require('mongoose')
 const User = require('./models/User')
@@ -14,6 +15,7 @@ app.use(cors({
     credentials: true
 }))
 app.use(express.json());
+app.use(cookieParser())
 mongoose.connect(process.env.MONGO_URL)
 
 
@@ -21,9 +23,25 @@ app.get('/', (req, res) => {
     res.json(`Hello World`)
 })
 
+app.get('/profile', async(req,res)=> {
+    const {token} = req.cookies
+    if(token) {
+        jwt.verify(token, jwtSecret, {}, (err,userData)=> {
+            if(err) throw err;
+            res.json({
+                userData
+            })
+        })
+    }
+    else {
+        res.status(401).json('no token')
+    }
+
+})
+
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    const existingUser = User.find({username})
+    const existingUser = await User.findOne({username})
     if(existingUser) {
         return res.status(409).json({
             msg: "user already exist"
@@ -33,10 +51,12 @@ app.post('/register', async (req, res) => {
     try {
         const newUser = await User.create({ username, password });
         const token = jwt.sign({
-            userId: newUser._id
+            userId: newUser._id,
+            username
         },jwtSecret )
         res.cookie('token', token).status(201).json({
-            _id: newUser._id
+            id: newUser._id,
+            username
         })
     } catch (error) {
         res.status(500).json({ error: 'Error registering new user' });
