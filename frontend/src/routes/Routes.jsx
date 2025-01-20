@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import RegisterAndLoginForm from '../components/RegisterAndLoginForm';
 import axios from 'axios';
+import Chat from '../components/Chat';
 
 export default function Routes() {
 	const { username, setLoggedUsername, id, setId } = useContext(UserContext);
@@ -16,7 +17,7 @@ export default function Routes() {
 	}, []);
 
 	if (username) {
-		return 'Logged in ' + username;
+		return <Chat/>;
 	}
 
 	return <RegisterAndLoginForm />;
