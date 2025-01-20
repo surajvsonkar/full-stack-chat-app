@@ -8,6 +8,7 @@ const User = require('./models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs')
 const cors = require('cors');
+const ws = require('ws')
 const bycrptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = process.env.JWT_SECRET;
 console.log(process.env.FRONTEND_URL);
@@ -94,6 +95,32 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
 	console.log('Server is running on port 3000');
 });
+
+const wss = new ws.WebSocketServer({server})
+wss.on('connection', (connection, req)=> {
+	const cookies = req.headers.cookie
+	if(cookies) {
+		const tokenCookieString = cookies.split(';').find(str => str.startsWith('token='))
+		if(tokenCookieString) {
+			const token = tokenCookieString.split('=')[1]
+			if(token) {
+				const {userId, username} = jwt.verify(token, jwtSecret)
+				connection.userId = userId
+				connection.username = username
+			}
+		}
+	}
+
+	[...wss.clients].forEach(client => {
+		client.send(JSON.stringify({
+			online: [...wss.clients].map(c => ({
+				userId: c.userId,
+				username: c.username
+	}))
+		}
+		))
+	})
+})
