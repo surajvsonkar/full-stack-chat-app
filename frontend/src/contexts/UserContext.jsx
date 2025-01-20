@@ -12,7 +12,9 @@ export function UserContextProvider({children}) {
             setId(res.data.userId)
             setLoggedUsername(res.data.username)
         })
-        console.log(username)
+        .catch((err) => {
+            console.error(err);
+        });
     }, [])
     return (
         <UserContext.Provider value={{username, setLoggedUsername, id, setId}}>

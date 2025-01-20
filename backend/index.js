@@ -32,7 +32,8 @@ app.get('/profile', async (req, res) => {
 		jwt.verify(token, jwtSecret, {}, (err, userData) => {
 			if (err) throw err;
 			res.json({
-				userData,
+				userId: userData.userId,
+				username: userData.username,
 			});
 		});
 	} else {
@@ -61,7 +62,7 @@ app.post('/register', async (req, res) => {
 			},
 			jwtSecret
 		);
-		res.cookie('token', token).status(201).json({
+		res.cookie('token', token, {sameSite: 'none', secure: true}).status(201).json({
 			id: newUser._id,
 			username,
 		});
