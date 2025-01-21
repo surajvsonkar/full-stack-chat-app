@@ -16,6 +16,7 @@ export function UserContextProvider({children}) {
             console.error(err);
         });
     }, [])
+    
     return (
         <UserContext.Provider value={{username, setLoggedUsername, id, setId}}>
             {children}

@@ -119,8 +119,15 @@ wss.on('connection', (connection, req)=> {
 			online: [...wss.clients].map(c => ({
 				userId: c.userId,
 				username: c.username
-	}))
+	})) 
 		}
 		))
 	})
+	
+	connection.on('message', (msg)=>{
+		const message =JSON.parse(msg.toString())
+		console.log(message)
+	})
+
 })
+
