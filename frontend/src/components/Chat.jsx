@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { UserContext, UserContextProvider } from '../contexts/UserContext';
+import { UserContext } from '../contexts/UserContext';
+import { uniqBy } from 'lodash';
 
 const Chat = () => {
 	const [ws, setWs] = useState(null);
@@ -9,7 +10,8 @@ const Chat = () => {
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [newMessageText, setNewMessageText] = useState('');
 	const [messages, setMessages] = useState([]);
-	const id = useContext(UserContext);
+	const { id } = useContext(UserContext); // Destructure id from UserContext
+
 	useEffect(() => {
 		const ws = new WebSocket('ws://localhost:3000');
 		setWs(ws);
@@ -31,19 +33,17 @@ const Chat = () => {
 
 	function handleMessage(e) {
 		const messageData = JSON.parse(e.data);
-		console.log(e.messageData)
+		console.log(messageData);
 		if ('online' in messageData) {
 			showOnlinePeople(messageData.online);
-		} else {
-			setMessages(prev => (
-				[...prev, {isOur: false, text: messageData.text}]
-			))
+		} else if ('text' in messageData) {
+			setMessages((prev) => [...prev, { ...messageData }]);
 		}
 	}
 
 	function sendMessage(ev) {
 		ev.preventDefault();
-		console.log(newMessageText);
+		// console.log(newMessageText);
 		ws.send(
 			JSON.stringify({
 				recipient: selectedUser,
@@ -51,14 +51,20 @@ const Chat = () => {
 			})
 		);
 		setNewMessageText('');
-		setMessages((prev) => [...prev, { text: newMessageText, isOur: true }]);
+		setMessages((prev) => [
+			...prev,
+			{
+				text: newMessageText,
+				sender: id,
+				recipient: selectedUser,
+			},
+		]);
 		// console.log(messages);
 	}
 
 	const onlinePeopleExclOurUser = { ...onlinePeople };
-	delete onlinePeopleExclOurUser[id.id];
-	// console.log(id.id)
-	// console.log(onlinePeopleExclOurUser)
+	delete onlinePeopleExclOurUser[id];
+	const messageWithouDupes = uniqBy(messages, 'id');
 
 	return (
 		<div className="flex h-screen">
@@ -98,13 +104,26 @@ const Chat = () => {
 						</div>
 					)}
 					{selectedUser && (
-						<div className='flex flex-col gap-1'>
-							{messages.map((message) => {
-								return ( 
-									<div className='border border-gray-200 bg-green-300 rounded-md p-2'>
-										{message.text}
+						<div className="flex flex-col gap-1 overflow-y-scroll">
+							{messageWithouDupes.map((message, index) => {
+								// Rename id to index
+								return (
+									<div>
+										<div
+											key={index} // Use index as the key
+											className={
+												`inline-block text-sm font-semibold rounded-md p-2 my-1 ` +
+												`${
+													message.sender === id
+														? 'bg-green-300 '
+														: 'bg-red-300 ml-auto'
+												}`
+											}
+										>
+											{message.text}
+										</div>
 									</div>
-								)
+								);
 							})}
 						</div>
 					)}
