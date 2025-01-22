@@ -57,6 +57,7 @@ const Chat = () => {
 				text: newMessageText,
 				sender: id,
 				recipient: selectedUser,
+				id: Date.now(),
 			},
 		]);
 		// console.log(messages);
@@ -104,27 +105,33 @@ const Chat = () => {
 						</div>
 					)}
 					{selectedUser && (
-						<div className="flex flex-col gap-1 overflow-y-scroll">
-							{messageWithouDupes.map((message, index) => {
-								// Rename id to index
-								return (
-									<div>
+						<div className='relative h-full'>
+							<div className="flex flex-col gap-1 overflow-y-scroll absolute inset-0 ">
+								{messageWithouDupes.map((message, index) => {
+									// Rename id to index
+									return (
 										<div
-											key={index} // Use index as the key
-											className={
-												`inline-block text-sm font-semibold rounded-md p-2 my-1 ` +
-												`${
-													message.sender === id
-														? 'bg-green-300 '
-														: 'bg-red-300 ml-auto'
-												}`
-											}
+											className={`${
+												message.sender === id ? 'text-left' : 'text-right'
+											}`}
 										>
-											{message.text}
+											<div
+												key={index} // Use index as the key
+												className={
+													`text-left inline-block text-sm font-semibold rounded-md p-2 my-1 ` +
+													`${
+														message.sender === id
+															? 'bg-green-300 '
+															: 'bg-red-300 ml-auto'
+													}`
+												}
+											>
+												{message.text}
+											</div>
 										</div>
-									</div>
-								);
-							})}
+									);
+								})}
+							</div>
 						</div>
 					)}
 				</div>
