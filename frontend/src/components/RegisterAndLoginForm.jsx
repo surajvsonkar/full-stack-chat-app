@@ -5,7 +5,7 @@ import { UserContext } from '../contexts/UserContext';
 const RegisterAndLoginForm = () => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
-	const [isLoggedIn, setisLoggedIn] = useState(false)
+	const [isLoggedIn, setisLoggedIn] = useState(true)
 	const {setLoggedUsername, setId } = useContext(UserContext)
 	async function handleSubmit(e){
 		e.preventDefault()
