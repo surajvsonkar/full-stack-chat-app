@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { UserContext } from '../contexts/UserContext';
@@ -10,6 +10,7 @@ const Chat = () => {
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [newMessageText, setNewMessageText] = useState('');
 	const [messages, setMessages] = useState([]);
+	const divUnderMessages = useRef()
 	const { id } = useContext(UserContext); // Destructure id from UserContext
 
 	useEffect(() => {
@@ -62,6 +63,13 @@ const Chat = () => {
 		]);
 		// console.log(messages);
 	}
+	
+	useEffect(()=> {
+		const div = divUnderMessages.current
+		if(div) {
+			div.scrollIntoView({behavior: 'smooth', })
+		}
+	}, [messages])
 
 	const onlinePeopleExclOurUser = { ...onlinePeople };
 	delete onlinePeopleExclOurUser[id];
@@ -106,7 +114,7 @@ const Chat = () => {
 					)}
 					{selectedUser && (
 						<div className='relative h-full'>
-							<div className="flex flex-col gap-1 overflow-y-scroll absolute inset-0 ">
+							<div className="flex flex-col gap-1 overflow-y-scroll absolute inset-0">
 								{messageWithouDupes.map((message, index) => {
 									// Rename id to index
 									return (
@@ -131,6 +139,7 @@ const Chat = () => {
 										</div>
 									);
 								})}
+								<div ref={divUnderMessages} className=''></div>
 							</div>
 						</div>
 					)}
