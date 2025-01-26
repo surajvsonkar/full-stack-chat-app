@@ -24,9 +24,30 @@ app.use(express.json());
 app.use(cookieParser());
 mongoose.connect(process.env.MONGO_URL);
 
+async function getUserDataFromRequest(req) {
+	return new Promise((resolve,reject)=> {
+		const token = req.cookies?.token
+		if(token){
+			jwt.verify(token, jwtSecret, {}, (err,userData)=> {
+				if(err) throw err;
+				resolve(userData)
+			})
+		} else {
+			reject('no token')
+		}
+	})
+}
+
+
 app.get('/', (req, res) => {
 	res.json(`Hello World`);
 });
+
+app.get('/messages/:userId', (req,res)=> {
+	const {userId} = req.params
+
+
+})
 
 app.get('/profile', async (req, res) => {
 	const { token } = req.cookies;
