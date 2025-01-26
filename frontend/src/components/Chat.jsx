@@ -4,6 +4,7 @@ import Logo from './Logo';
 import { UserContext } from '../contexts/UserContext';
 import { uniqBy } from 'lodash';
 import axios from 'axios';
+import { connect } from 'mongoose';
 
 const Chat = () => {
 	const [ws, setWs] = useState(null);
@@ -15,15 +16,21 @@ const Chat = () => {
 	const { id } = useContext(UserContext); // Destructure id from UserContext
 
 	useEffect(() => {
+		connectToWs()
+		}, []);
+		
+		function connectToWs(){
 		const ws = new WebSocket('ws://localhost:3000');
 		setWs(ws);
 		ws.addEventListener('message', handleMessage);
-		// setInterval(()=> {
-		// 	const ws = new WebSocket('ws://localhost:3000')
-		// 	setWs(ws)
-		// 	ws.addEventListener('message', handleMessage)
-		// }, 3000)
-	}, []);
+		ws.addEventListener('close', ()=> {
+			setTimeout(() => {
+				console.log('Disconnected. trying to reconnect.')
+				connectToWs()
+			}, 1000);
+		})
+		
+	}
 
 	function showOnlinePeople(peopleArray) {
 		const people = {};
