@@ -13,7 +13,7 @@ const Chat = () => {
 	const [newMessageText, setNewMessageText] = useState('');
 	const [messages, setMessages] = useState([]);
 	const divUnderMessages = useRef()
-	const { id } = useContext(UserContext); // Destructure id from UserContext
+	const { id } = useContext(UserContext);
 
 	useEffect(() => {
 		connectToWs()
